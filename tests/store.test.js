@@ -36,3 +36,11 @@ test('same date and description with different cents are both stored', () => {
     { added: 2, skipped: 0 },
   );
 });
+
+test('one stored copy and two identical lines in the file adds one and skips one', () => {
+  const db = new DatabaseSync(':memory:');
+  const same = row('2026-08-02', 'Lowtide Grocers', 580);
+  storeRows(db, [same]);
+  assert.deepEqual(storeRows(db, [same, same]), { added: 1, skipped: 1 });
+  assert.equal(count(db), 2);
+});
