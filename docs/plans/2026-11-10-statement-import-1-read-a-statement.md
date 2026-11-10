@@ -6,8 +6,6 @@
 
 **Tech Stack:** Node 22.13 or later, `node:test`, `node:assert/strict`. No new dependency.
 
-**Spec:** `.wheelhouse/feature/approved.md` (slice 1 of 4)
-
 ## Global Constraints
 
 - Node 22.13 or later (`engines` in `package.json`); add no dependency.
@@ -262,16 +260,3 @@ git commit -m "feat: add the import-statement feature switch"
 
 ---
 
-## Self-Review
-
-**Spec coverage (slice 1, done contract line 1):** "A statement reads into rows of date, description and cents, or a plain error when it is not a statement" is Task 2. The five spec tests map to: valid file (Task 2, test 1), brackets and minus (Task 2, test 2), quoted comma (Task 2, test 3; Task 1 test 1), wrong header (Task 2, test 4), bad date or amount (Task 2, test 5). Spec's trailing-blank-line piece is in Task 2 (header-only and blank lines test). Feature switch file is Task 3. Stores, pages and home page belong to later slices and are out of scope here.
-
-**Step scan:** Every step names one action with a checkable result. The amount and date rules are given as rules, not code, because the approved document fixes them and the signatures plus the rules determine the body.
-
-**Type consistency:** `splitCsvLine` returns `string[] | null` in Task 1 and is consumed the same way in Task 2. `readStatement` returns `{ date, description, cents }` and the tests read `date`, `description` and `cents` as named. `NOT_A_STATEMENT` is the one error text, used in both the reader and its tests.
-
-**Review Focus:** each of the five lines has a test in its owning task (listed in the section).
-
-**Proportion:** the plan is shorter than the approved document's slice text plus its code samples; no function bodies are given.
-
-**Decisions taken here (logged in the ledger):** the CSV reader sits in its own module; negative zero reads as zero; `"1,234.50"` is refused as the approved document's amount rule says; the feature switch is created `true` as approved, with no reader until slice 3.
