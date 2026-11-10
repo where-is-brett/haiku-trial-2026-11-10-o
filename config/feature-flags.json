@@ -1,3 +1,4 @@
 {
-  "import-statement": true
+  "import-statement": true,
+  "edit-category": false
 }

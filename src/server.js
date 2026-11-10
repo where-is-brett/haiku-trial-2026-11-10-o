@@ -1,12 +1,14 @@
 // src/server.js
 import http from 'node:http';
 import { DatabaseSync } from 'node:sqlite';
+import { addCategoryColumn } from './lib/transactions.js';
 
 const port = Number(process.env.PORT ?? 3000);
 const db = new DatabaseSync(process.env.LEDGER_DB ?? 'ledger.db');
 db.exec(
   'CREATE TABLE IF NOT EXISTS transactions (id INTEGER PRIMARY KEY, date TEXT, description TEXT, cents INTEGER)',
 );
+addCategoryColumn(db);
 
 function page(body) {
   return `<!doctype html>
