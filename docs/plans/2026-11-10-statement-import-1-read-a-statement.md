@@ -2,7 +2,7 @@
 
 **Goal:** A bank statement's text becomes rows of date, description and cents, or the plain error "This file isn't a bank statement with Date, Description and Amount columns." when it is not a statement.
 
-**Architecture:** A small hand-written CSV line reader (`src/lib/csv.js`) feeds a pure reader (`src/lib/statement.js`) that checks each line's text before it calls the existing `parseDate` and `parseAmount`. Nothing is stored and no page changes in this slice. A feature switch file is created with the key `import-statement` set to `true`, as the approved document says; nothing reads it yet.
+**Architecture:** A small hand-written CSV line reader (`src/lib/csv.js`) feeds a pure reader (`src/lib/statement.js`) that checks each line's text before it calls the existing `parseDate` and `parseAmount`. Nothing is stored and no page changes in this slice. A feature switch file is created with the key `import-statement` set to `true`; nothing reads it yet.
 
 **Tech Stack:** Node 22.13 or later, `node:test`, `node:assert/strict`. No new dependency.
 
@@ -98,7 +98,7 @@ git commit -m "feat: read one CSV line into fields"
   - `NOT_A_STATEMENT: string`, the plain error text given above.
   - `readStatement(text: string) -> Array<{ date: string, description: string, cents: number }>`. The date is ISO `YYYY-MM-DD`; `cents` is a whole number, negative for money coming back. Rows come in file order. Throws `new Error(NOT_A_STATEMENT)` for any refused statement, and returns `[]` for a header with no rows.
 
-Rules the reader follows (fixed by the approved document, so the code must match them):
+Rules the reader follows (the code must match them):
 - Remove a leading `﻿`. Split on `/\r?\n/`. The first line, trimmed, must equal `Date,Description,Amount`.
 - Each later line that is blank after trimming is skipped. Any other line goes to `splitCsvLine`; `null`, or a result with a length other than 3, is refused.
 - Date: the trimmed field must match `/^\d{2}\/\d{2}\/\d{4}$/` and be a real calendar date. Check this by building `Date.UTC(year, month - 1, day)` and comparing its day, month and year with the parts. Then return `parseDate` of the trimmed field.
