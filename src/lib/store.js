@@ -17,18 +17,25 @@ export function storeRows(db, rows) {
   const seen = new Map();
   let added = 0;
   let skipped = 0;
-  for (const { date, description, cents } of rows) {
-    const key = JSON.stringify([date, description, cents]);
-    const k = seen.get(key) ?? 0;
-    seen.set(key, k + 1);
+  db.exec('BEGIN');
+  try {
+    for (const { date, description, cents } of rows) {
+      const key = JSON.stringify([date, description, cents]);
+      const k = seen.get(key) ?? 0;
+      seen.set(key, k + 1);
 
-    const stored = countStored.get(date, description, cents).n;
-    if (k < stored) {
-      skipped += 1;
-    } else {
-      insert.run(date, description, cents);
-      added += 1;
+      const stored = countStored.get(date, description, cents).n;
+      if (k < stored) {
+        skipped += 1;
+      } else {
+        insert.run(date, description, cents);
+        added += 1;
+      }
     }
+    db.exec('COMMIT');
+  } catch (err) {
+    db.exec('ROLLBACK');
+    throw err;
   }
   return { added, skipped };
 }

@@ -44,3 +44,10 @@ test('one stored copy and two identical lines in the file adds one and skips one
   assert.deepEqual(storeRows(db, [same, same]), { added: 1, skipped: 1 });
   assert.equal(count(db), 2);
 });
+
+test('a failure part way through an import stores nothing from it', () => {
+  const db = new DatabaseSync(':memory:');
+  const bad = { date: '2026-08-03', description: 'Broken', cents: Symbol('not a number') };
+  assert.throws(() => storeRows(db, [row('2026-08-01', 'A', 100), row('2026-08-02', 'B', 200), bad]));
+  assert.equal(count(db), 0);
+});
