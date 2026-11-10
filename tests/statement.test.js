@@ -39,11 +39,21 @@ test('a bad date or a bad amount is refused with the plain error', () => {
     '02/08/2026,Lowtide Grocers,abc',
     '02/08/2026,Lowtide Grocers,--5',
     '02/08/2026,Lowtide Grocers,12.5.0',
-    '02/08/2026,Lowtide Grocers,"1,234.50"', // thousands separator is refused
+    '02/08/2026,Lowtide Grocers,"1,23.00"', // commas only in groups of three
+    '02/08/2026,Lowtide Grocers,"1,2345.00"',
+    '02/08/2026,Lowtide Grocers,"12,34,567.00"',
+    '02/08/2026,Lowtide Grocers,",100.00"',
   ];
   for (const line of badLines) {
     assert.throws(() => readStatement(`${HEADER}\n${line}\n`), { message: NOT_A_STATEMENT }, line);
   }
+});
+
+test('thousands commas in groups of three are read as money', () => {
+  const rows = readStatement(
+    `${HEADER}\n02/08/2026,Big Payment,"1,234.00"\n03/08/2026,Bigger,"12,345.67"\n04/08/2026,Biggest,"1,000,000"\n`,
+  );
+  assert.deepEqual(rows.map((row) => row.cents), [123400, 1234567, 100000000]);
 });
 
 test('a byte-order mark and CRLF line endings read in full', () => {

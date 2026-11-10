@@ -48,7 +48,8 @@ function readDate(field) {
 }
 
 // Returns whole cents for an amount: brackets or a leading minus mean money
-// coming back. Zero is never negative.
+// coming back. Zero is never negative. Commas are allowed only as thousands
+// separators in groups of three, such as 1,234.00.
 function readCents(field) {
   let text = field.trim();
   let negative = false;
@@ -59,7 +60,7 @@ function readCents(field) {
     negative = true;
     text = text.slice(1);
   }
-  if (!/^\d+(\.\d+)?$/.test(text)) throw new Error(NOT_A_STATEMENT);
-  const cents = parseAmount(text);
+  if (!/^(\d{1,3}(,\d{3})+|\d+)(\.\d+)?$/.test(text)) throw new Error(NOT_A_STATEMENT);
+  const cents = parseAmount(text.replace(/,/g, ''));
   return negative && cents !== 0 ? -cents : cents;
 }
